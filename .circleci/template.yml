@@ -2,35 +2,35 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: mine
 Resources:
   EC2Instance:
-  - Type: "AWS::EC2::Instance"
+    Type: AWS::EC2::Instance
     Properties:
-    SecurityGroups:
-    - !Ref InstanceSecurityGroup
-    # Change this, as applicable to you      
-    KeyName: prom.pem
-    # Change this, as applicable to you
-    # You may need to find out what instance types are available in your region - use https://cloud-images.ubuntu.com/locator/ec2/
-    ImageId: "ami-07ec4220c92589b40"
-    InstanceType: t2.micro
-    Tags:
-    - Key: Name
-      Value: prometheus
+      SecurityGroupIds:
+      - !Ref InstanceSecurityGroup
+      # Change this, as applicable to you      
+      KeyName: prom
+      # Change this, as applicable to you
+      # You may need to find out what instance types are available in your region - use https://cloud-images.ubuntu.com/locator/ec2/
+      ImageId: "ami-07ec4220c92589b40"
+      InstanceType: t2.micro
+      Tags:
+      - Key: Name
+        Value: prometheus
   Ec2Instance:
-  - Type: 'AWS::EC2::Instance'
+    Type: AWS::EC2::Instance
     Properties:
-    SecurityGroups:
-    - !Ref InstanceSecurityGroup
-    # Change this, as applicable to you      
-    KeyName: prom.pem
-    # Change this, as applicable to you
-    # You may need to find out what instance types are available in your region - use https://cloud-images.ubuntu.com/locator/ec2/
-    ImageId: 'ami-07ec4220c92589b40'
-    InstanceType: t2.micro
-    Tags:
-    - Key: Name
-      Value: node-exporter
+      SecurityGroupIds:
+      - !Ref InstanceSecurityGroup
+      # Change this, as applicable to you      
+      KeyName: prom.pem
+      # Change this, as applicable to you
+      # You may need to find out what instance types are available in your region - use https://cloud-images.ubuntu.com/locator/ec2/
+      ImageId: 'ami-07ec4220c92589b40'
+      InstanceType: t2.micro
+      Tags:
+      - Key: Name
+        Value: node-exporter
   InstanceSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
+    Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable SSH access via port 22
       SecurityGroupIngress:
