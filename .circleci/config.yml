@@ -14,7 +14,8 @@ jobs:
     - checkout # check out the code in the project directory
     - run:
         name: Create Cloudformation Stack
-        command: "aws cloudformation deploy \\\n--template-file .circleci/template.yml \\\n--stack-name myStack \\\n aws cloudformation describe-stack-events --stack-name myStack"
+        command: "aws cloudformation deploy \\\n--template-file .circleci/template.yml \\\n--stack-name myStack"
+        command: "aws cloudformation describe-stack-events --stack-name myStack"
     - run:
         name: Add IP to ansible Inventory
         command: |
