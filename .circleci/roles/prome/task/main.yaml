@@ -1,0 +1,87 @@
+- - -
+- name: Update yum repo
+  yum:
+    name: "*"
+    state: latest
+- name: Create prometheus user
+  shell: "sudo useradd --no-create-home --shell /bin/false prometheus  \nsudo mkdir /etc/prometheus\nsudo mkdir /var/lib/prometheus\nsudo chown prometheus:prometheus /etc/promethetheus\nsudo chown prometheus:prometheus /var/lib/prometheus\n"
+- name: Download prometheus from a path
+  get_url:
+    url: https://github.com/prometheus/prometheus/releases/download/v2.3.2/prometheus-2.3.2.linux-amd64.tar.gz/
+    dest: /home/ubuntu/prometheus-2.3.2.linux-amd64.tar.gz
+- name: download Alertmanager from a path
+  get_url:
+    url: https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz/
+    dest: /home/ubuntu/alertmanager-0.21.0.linux-amd64.tar.gz
+
+- name: Extract prometheus
+  unarchive:
+    src: /home/ubuntu/prometheus-2.3.2.linux-amd64.tar.gz
+    dest: /home/ubuntu/
+    remote_src: yes
+- name: Extract Alertmanager
+  unarchive:
+    src: /home/ubuntu/alertmanager-0.21.0.linux-amd64.tar.gz
+    dest: /home/ubuntu
+    remote_src: yes
+- name: Move Prometheus and Alertmanager
+  shell: |
+    sudo rm -rf prometheus-files
+    sudo mv /home/ubuntu/prometheus-2.3.3.linux-amd64 prometheus-files
+    sudo rm -rf alertmanager-files
+    sudo mv /home/ubuntu/alertmanager-0.21.0.linux-amd64 alertmanager-files
+- name: Move files
+  shell: |
+    sudo cp prometheus-files/prometheus /usr/local/bin/
+    sudo cp alertmanager-files/alertmanager /usr/local/bin
+    sudo cp prometheus-files/promtool /usr/local/bin/
+    sudo cp alertmanager-files/amtool /usr/local/bin/
+    sudo mkdir /var/lib/alertmanager
+    sudo rm -rf alertmanager*
+    sudo chown prometheus:prometheus /usr/local/bin/prometheus
+    sudo chown prometheus:prometheus /usr/local/bin/promtool
+    sudo cp -r prometheus-files/consoles /etc/prometheus
+    sudo cp -r prometheus-files/console_libraries /etc/prometheus
+    sudo chown -R prometheus:prometheus /etc/prometheus/consoles
+    sudo chown -R prometheus:prometheus /etc/prometheus/console_libraries
+- name: Prepare DB directory
+  shell: |
+    sudo mkdir /opt/prometheus-setup/
+    sudo chown -R prometheus:prometheus /opt/prometheus-setup/
+- name: Copy prometheus.yaml
+  become: true
+  copy:
+    src: prometheus.yml
+    dest: /etc/prometheus/
+- name: Copy alertmanager.yml
+  become: true
+  copy:
+    src: alertmanager.yml
+    dest: /etc/prometheus/
+- name: Copy prometheus.service
+  become: true
+  copy:
+    src: prometheus.service
+    dest: /etc/systemd/system/
+- name: Copy alertmanager.service
+  become: true
+  copy:
+    src: alertmanager.service
+    dest: /etc/systemd/system/
+- name: Copy rule.yml
+  become: true
+  copy:
+    src: rules.yml
+    dest: /etc/prometheus/
+- name: Change ownership of service and config files
+  shell: |
+    sudo chown prometheus:prometheus /etc/prometheus/prometheus.yaml
+    sudo chown prometheus:prometheus /etc/systemd/system/prometheus.service
+    sudo chown -R prometheus:prometheus /etc/prometheus
+- name: Reload prometheus to register changes
+  shell: |
+    sudo systemctl daemon-reload
+    sudo systemctl start prometheus
+    sudo systemctl status prometheus
+    sudo systemctl enable alertmanager
+    sudo systemctl start alertmanager

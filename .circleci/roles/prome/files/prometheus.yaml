@@ -1,0 +1,33 @@
+global:
+  scrape_intervals: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'prometheus'
+rule_files:
+- /etc/prometheus/rules.yml
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - localhost:9093
+scrape_configs:
+- job_name: 'node'
+  ec2_sd_configs:
+  - region: us-east-1
+    access_key: AKIAQAX646D6ASTKZSJH
+    secret_key: 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
+    port: 9100
+
+
+
+
+
+
+scrape_configs:
+- job_name: 'node'
+  ec2_sd_configs:
+  - region: us-east-1
+    access_key: PUT_THE_ACCESS_KEY_HERE
+    secret_key: PUT_THE_SECRET_KEY_HERE
+    port: 9100
+

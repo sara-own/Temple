@@ -1,0 +1,16 @@
+---
+- name: Prometheus
+  hosts: 
+  user: ubuntu
+  become: true
+  roles:
+  - prome
+  - node-exporter
+
+ 
+
+
+ 
+
+
+

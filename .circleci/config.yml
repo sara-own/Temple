@@ -14,15 +14,50 @@ jobs:
     - checkout # check out the code in the project directory
     - run:
         name: Create Cloudformation Stack
+        command: "aws cloudformation deploy \\\n--template-file .circleci/template.yml \\\n--stack-name \"myStack"
+    - run:
+        name: Add IP to ansible Inventory
         command: |
-          aws cloudformation deploy \
-          --template-file template.yml \
-          --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
-          --region us-east-1
+          PUBLIC_IP=$(aws ec2 describe-instances \
+          --filters "Name=tag:Name,Values=prometheus" \
+          --query 'Reservations[*].Instances[*].PublicIpAddress' \
+          --output text)
+          echo $PUBLIC_IP >> .circleci/inventory.txt
+          cat .circleci/inventory.txt
+    - run:
+        name: Add IP to ansible Inventory
+        command: |
+          PUBLIC_IP=$(aws ec2 describe-instances \
+          --filters "Name=tag:Name,Values=node-exporter" \
+          --query 'Reservations[*].Instances[*].PublicIpAddress' \
+          --output text)
+          echo $PUBLIC_IP >> .circleci/inventory.txt
+          cat .circleci/inventory.txt
+
+    - persist_to_workspace:
+        root: ~/
+        paths:
+        - project/.circleci/inventory.txt
+  configure_infrastructure:
+    docker:
+    - image: python:3.7-alpine3.11
+    steps:
+    - checkout
+    - add_ssh_keys:
+        fingerprints: ["SHA256:H/wNS3ZyM2Vf+wQHD46toXq8lwSPyiqT2N+dcrwSteA"]
+    - run:
+        name: install dependencies
+        command: |
+          apk add --update ansible
+    - run:
+        name: configure_server
+        command: "ansible-playbook -i inventory.txt main.yml"
 # Sequential workflow
 workflows:
   # Name the workflow
   myWorkflow:
     jobs:
     - create_infrastructure
+    - configure_infrastructure
+
 
