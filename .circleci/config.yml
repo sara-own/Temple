@@ -46,7 +46,7 @@ jobs:
     steps:
     - checkout
     - add_ssh_keys:
-        fingerprints: ["SHA256:H/wNS3ZyM2Vf+wQHD46toXq8lwSPyiqT2N+dcrwSteA"]
+        fingerprints: ["SHA256:OFquxwnmpBsbbrmQ7JQX3YiCTuEqaPDk+afPhvowa5g"]
     - run:
         name: install dependencies
         command: "apt-get update\napt-get install sudo\nsudo apt-get install software-properties-common -y\nsudo add-apt-repository --yes --update ppa:ansible/ansible\nsudo apt-get install ansible -y \napk add --update ansible\n"
